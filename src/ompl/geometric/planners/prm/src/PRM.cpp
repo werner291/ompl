@@ -418,20 +418,29 @@ bool ompl::geometric::PRM::maybeConstructSolution(const std::vector<Vertex> &sta
                 {
                     base::Cost pathCost = p->cost(opt_);
                     if (opt_->isCostBetterThan(pathCost, bestCost_))
+                    {
                         bestCost_ = pathCost;
+
+                        // Report this path as a new intermediate solution.
+                        if (getProblemDefinition()->getIntermediateSolutionCallback()) {
+                            std::vector<const base::State*> const_states(
+                                p->as<geometric::PathGeometric>()->getStates().begin(),
+                                p->as<geometric::PathGeometric>()->getStates().end());
+                            getProblemDefinition()->getIntermediateSolutionCallback()(this, const_states, pathCost);
+                        }
+                    }
+
                     // Check if optimization objective is satisfied
                     if (opt_->isSatisfied(pathCost))
                     {
                         solution = p;
                         return true;
                     }
+
                     if (opt_->isCostBetterThan(pathCost, sol_cost))
                     {
                         solution = p;
                         sol_cost = pathCost;
-
-                        // Report this path as a new intermediate solution.
-                        getProblemDefinition()->addSolutionPath(p,false,-1.0,this->getName());
                     }
                 }
             }

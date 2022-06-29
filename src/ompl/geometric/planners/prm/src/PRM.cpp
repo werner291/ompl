@@ -429,6 +429,9 @@ bool ompl::geometric::PRM::maybeConstructSolution(const std::vector<Vertex> &sta
                     {
                         solution = p;
                         sol_cost = pathCost;
+
+                        // Report this path as a new intermediate solution.
+                        getProblemDefinition()->addSolutionPath(p,false,-1.0,this->getName());
                     }
                 }
             }
